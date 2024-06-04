@@ -12,13 +12,13 @@ def canUnlockAll(boxes):
 
     while keys:
         for key in tuple(keys):
-            if isinstance(boxes[key], list):
+            if key < len(boxes) and boxes[key] is not None:
                 keys = keys | set(boxes[key])
-            boxes[key] = None
+                boxes[key] = None
             keys.remove(key)
 
     for boxe in boxes:
-        if isinstance(boxe, list):
+        if boxe is not None:
             return False
 
     return True
