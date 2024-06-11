@@ -4,23 +4,24 @@
 number of operations required to reach the target value.
 """
 
-from typing import Union
+import sys
 
 
-def minOperations(target: int) -> Union[int, float]:
+def minOperations(n: int) -> int:
     """
     Calculates the minimum number of operations required
     to reach the target value.
 
     Args:
-        target (int): The target value to reach.
+        n (int): The target value to reach.
 
     Returns:
         int: The minimum number of operations required
             to reach the target value.
     """
-    result: Union[float, int] = float('+inf')
-    initial_count: int = 1
+    result = float('+inf')
+    initial_count = 1
+    sys.setrecursionlimit(100_000)
 
     def bt(curr_count: int, prev_copy: int, curr_ops: int) -> None:
         """
@@ -38,17 +39,17 @@ def minOperations(target: int) -> Union[int, float]:
             None
         """
         nonlocal result
-        if curr_count == target:
+        if curr_count == n:
             result = min(result, curr_ops)
             return
 
         if prev_copy == 0:
             prev_copy = curr_ops = 1
 
-        if curr_count + prev_copy <= target and curr_ops < result:
+        if curr_count + prev_copy <= n and curr_ops < result:
             bt(curr_count + prev_copy, prev_copy, curr_ops + 1)
 
-        if curr_count * 2 <= target and curr_ops < result:
+        if curr_count * 2 <= n and curr_ops < result:
             bt(curr_count * 2, curr_count, curr_ops + 2)
 
     bt(initial_count, 0, 0)
