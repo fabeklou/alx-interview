@@ -1,43 +1,32 @@
 #!/usr/bin/python3
 
-"""This module contains, a function that calculates the minimum
-number of operations required to reach the target value.
+"""Calculate the minimum number of operations
+required to reach a given number.
 """
-
-from collections import deque
 
 
 def minOperations(n: int) -> int:
     """
-    Calculates the minimum number of operations required
-    to reach the target value.
+    Calculate the minimum number of operations required
+    to reach a given number.
 
     Args:
-        n (int): The target value to reach.
+        n (int): The target number.
 
     Returns:
-        int: The minimum number of operations required
-            to reach the target value.
+        int: The minimum number of operations required.
+
     """
-    result = float('+inf')
-    dq = deque([(1, 0, 0)])
-    visited = set()
+    if n <= 0:
+        return 0
 
-    while dq:
-        count, copied, ops = dq.popleft()
-        visited.add((count, copied))
+    prime: int = 2  # first prime number
+    operations: int = 0
 
-        if count == n:
-            result = min(result, ops)
+    while n > 1:
+        while n % prime == 0:
+            n //= prime
+            operations += prime
+        prime += 1
 
-        if copied == 0:
-            copied = ops = 1
-
-        past = count + copied
-        if past <= n and ops < result and (past, copied) not in visited:
-            dq.append((count + copied, copied, ops + 1))
-        cpy_past = count * 2
-        if cpy_past <= n and ops < result and (cpy_past, count) not in visited:
-            dq.append((count * 2, count, ops + 2))
-
-    return 0 if result == float('+inf') else result
+    return operations
