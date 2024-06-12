@@ -4,7 +4,7 @@
 number of operations required to reach the target value.
 """
 
-import sys
+from collections import deque
 
 
 def minOperations(n: int) -> int:
@@ -20,37 +20,24 @@ def minOperations(n: int) -> int:
             to reach the target value.
     """
     result = float('+inf')
-    initial_count = 1
-    sys.setrecursionlimit(100_000)
+    dq = deque([(1, 0, 0)])
+    visited = set()
 
-    def bt(curr_count: int, prev_copy: int, curr_ops: int) -> None:
-        """
-        Backtracking function to find the minimum number of operations
-        required to reach the target count.
+    while dq:
+        count, copied, ops = dq.popleft()
+        visited.add((count, copied))
 
-        Args:
-            curr_count (int): The current count of characters.
-            prev_copy (int): The count of characters copied in
-                the previous operation.
-            curr_ops (int): The current number of operations
-                performed.
+        if count == n:
+            result = min(result, ops)
 
-        Returns:
-            None
-        """
-        nonlocal result
-        if curr_count == n:
-            result = min(result, curr_ops)
-            return
+        if copied == 0:
+            copied = ops = 1
 
-        if prev_copy == 0:
-            prev_copy = curr_ops = 1
+        past = count + copied
+        if past <= n and ops < result and (past, copied) not in visited:
+            dq.append((count + copied, copied, ops + 1))
+        cpy_past = count * 2
+        if cpy_past <= n and ops < result and (cpy_past, count) not in visited:
+            dq.append((count * 2, count, ops + 2))
 
-        if curr_count + prev_copy <= n and curr_ops < result:
-            bt(curr_count + prev_copy, prev_copy, curr_ops + 1)
-
-        if curr_count * 2 <= n and curr_ops < result:
-            bt(curr_count * 2, curr_count, curr_ops + 2)
-
-    bt(initial_count, 0, 0)
     return 0 if result == float('+inf') else result
