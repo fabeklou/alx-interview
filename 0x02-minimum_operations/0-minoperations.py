@@ -20,8 +20,8 @@ def minOperations(n: int) -> int:
     if n <= 0:
         return 0
 
-    prime: int = 2  # first prime number
-    operations: int = 0
+    prime = 2
+    operations = 0
 
     while n > 1:
         while n % prime == 0:
