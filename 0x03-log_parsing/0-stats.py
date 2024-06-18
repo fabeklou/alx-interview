@@ -13,67 +13,56 @@ The module expects log entries to be in the following format:
 <IP Address> - [<Date>] "GET /projects/260 HTTP/1.1" <Status Code> <File Size>
 """
 
-import signal
 import sys
+import signal
 
-
-def print_metrics():
-    """
-    Prints the metrics of the log file.
-    """
-    print("File size: {}".format(total_file_size))
-    for code in ordered_status_codes:
-        if code in status_codes_freq and status_codes_freq[code] > 0:
-            print("{}: {}".format(code, status_codes_freq[code]))
-
-
-def line_parsing(line):
-    """
-    Parses a log line and updates the frequency of status codes
-    and the total file size.
-
-    Args:
-        line (str): The log line to be parsed.
-    """
-    global total_file_size
-    try:
-        tokens = line.split()
-        if len(tokens) < 9:
-            return
-        status_code, file_size = int(tokens[-2]), int(tokens[-1])
-        if status_code in status_codes_freq:
-            status_codes_freq[status_code] += 1
-            total_file_size += file_size
-    except Exception:
-        pass
-
-
+total_size = 0
+status_codes = {
+    200: 0, 301: 0, 400: 0, 401: 0,
+    403: 0, 404: 0, 405: 0, 500: 0
+}
 line_count = 0
-total_file_size = 0
-status_codes_freq = {}
-ordered_status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
 
-for code in ordered_status_codes:
-    status_codes_freq[code] = 0
+
+def print_stats():
+    """Prints the current statistics"""
+    print(f"File size: {total_size}")
+    for code in sorted(status_codes):
+        if status_codes[code] > 0:
+            print(f"{code}: {status_codes[code]}")
 
 
 def signal_handler(sig, frame):
-    """Handles the interrupt signal to print stats before exiting"""
-    print_metrics()
+    """Handles the interrupt signal to print stats
+    before exiting
+    """
+    print_stats()
     sys.exit(0)
 
 
-# Register the signal handler
 signal.signal(signal.SIGINT, signal_handler)
 
+try:
+    for line in sys.stdin:
+        parts = line.split()
+        if len(parts) < 9:
+            continue
+        try:
+            size = int(parts[-1])
+            code = int(parts[-2])
+            total_size += size
+            if code in status_codes:
+                status_codes[code] += 1
+        except (ValueError, IndexError):
+            continue
 
-if __name__ == "__main__":
-    try:
-        for line in sys.stdin:
-            line_count += 1
-            line_parsing(line)
-            if line_count % 10 == 0:
-                print_metrics()
-    except KeyboardInterrupt:
-        print_metrics()
-        sys.exit(0)
+        line_count += 1
+
+        if line_count % 10 == 0:
+            print_stats()
+
+    print_stats()
+
+except KeyboardInterrupt:
+    print_stats()
+    sys.exit(0)
