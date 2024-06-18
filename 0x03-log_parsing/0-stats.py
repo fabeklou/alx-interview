@@ -74,7 +74,5 @@ if __name__ == "__main__":
             line_parsing(line)
             if line_count % 10 == 0:
                 print_metrics()
-        print_metrics()
     except KeyboardInterrupt:
         print_metrics()
-        pass
