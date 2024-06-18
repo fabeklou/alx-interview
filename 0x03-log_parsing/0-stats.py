@@ -18,7 +18,6 @@ Example:
 """
 
 import re
-import signal
 import sys
 
 
@@ -46,18 +45,6 @@ def print_metrics():
             print("{}: {}".format(code, status_codes_freq[code]))
 
 
-def signal_handler(signum, frame):
-    """
-    Signal handler function that is called when a signal is received.
-
-    Args:
-        signum (int): The signal number.
-        frame (frame): The current stack frame at the time
-            the signal was received.
-    """
-    print_metrics()
-
-
 line_count = 0
 total_file_size = 0
 status_codes_freq = {}
@@ -67,21 +54,21 @@ pattern = '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} - \[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:
 for code in ordered_status_codes:
     status_codes_freq[code] = 0
 
-signal.signal(signal.SIGINT, signal_handler)
+if __name__ == "__main__":
+    try:
+        for line in sys.stdin:
+            line_count += 1
 
-try:
-    for line in sys.stdin:
-        line_count += 1
+            log = line.strip()
+            if re.search(pattern, line):
+                tokens = log.split()
+                method, file_size = int(tokens[-2]), int(tokens[-1])
+                if method in status_codes_freq:
+                    status_codes_freq[method] += 1
+                    total_file_size += file_size
 
-        log = line.strip()
-        if re.search(pattern, line):
-            tokens = log.split(' ')
-            method, file_size = int(tokens[-2]), int(tokens[-1])
-            if method in status_codes_freq:
-                status_codes_freq[method] += 1
-                total_file_size += file_size
-
-        if line_count == 10:
-            print_metrics()
-except Exception as err:
-    print(err)
+            if line_count == 10:
+                print_metrics()
+    except KeyboardInterrupt:
+        print_metrics()
+        raise
