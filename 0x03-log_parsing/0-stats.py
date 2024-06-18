@@ -1,11 +1,42 @@
 #!/usr/bin/python3
 
+"""
+This module is used for parsing log files and generating statistics.
+
+The module reads log entries from the standard input
+and calculates the following metrics:
+- File size: The total size of the log file.
+- Status code frequency: The frequency of each
+  HTTP status code in the log file.
+
+The module expects log entries to be in the following format:
+<IP Address> - [<Date>] "GET /projects/260 HTTP/1.1" <Status Code> <File Size>
+
+Example:
+192.168.0.1 -\
+[2022-01-01 12:00:00.000000] "GET /projects/260 HTTP/1.1" 200 1024
+"""
+
 import re
 import signal
 import sys
 
 
 def print_metrics():
+    """
+    Prints the metrics of the log file.
+
+    This function prints the file size and the frequency of each status code
+    in the log file. It uses the global variables `total_file_size`,
+    `ordered_status_codes`, and `status_codes_freq` to retrieve the necessary
+    information.
+
+    Parameters:
+        None
+
+    Returns:
+        None
+    """
     global line_count
     line_count = 0
 
@@ -16,6 +47,14 @@ def print_metrics():
 
 
 def signal_handler(signum, frame):
+    """
+    Signal handler function that is called when a signal is received.
+
+    Args:
+        signum (int): The signal number.
+        frame (frame): The current stack frame at the time
+            the signal was received.
+    """
     print_metrics()
 
 
