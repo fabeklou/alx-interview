@@ -75,4 +75,4 @@ if __name__ == "__main__":
             if line_count % 10 == 0:
                 print_metrics()
     except KeyboardInterrupt:
-        print_metrics()
+        pass
