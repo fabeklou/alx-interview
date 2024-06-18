@@ -38,8 +38,8 @@ def line_parsing(line):
     global total_file_size
     try:
         tokens = line.split()
-        if len(tokens) != 9:
-            raise
+        if len(tokens) < 9:
+            return
         status_code, file_size = int(tokens[-2]), int(tokens[-1])
         if status_code in status_codes_freq:
             status_codes_freq[status_code] += 1
@@ -74,5 +74,7 @@ if __name__ == "__main__":
             line_parsing(line)
             if line_count % 10 == 0:
                 print_metrics()
+        print_metrics()
     except KeyboardInterrupt:
-        pass
+        print_metrics()
+        sys.exit(0)
