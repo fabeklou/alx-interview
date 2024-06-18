@@ -11,30 +11,14 @@ and calculates the following metrics:
 
 The module expects log entries to be in the following format:
 <IP Address> - [<Date>] "GET /projects/260 HTTP/1.1" <Status Code> <File Size>
-
-Example:
-192.168.0.1 -\
-[2022-01-01 12:00:00.000000] "GET /projects/260 HTTP/1.1" 200 1024
 """
 
-import re
 import sys
 
 
 def print_metrics():
     """
     Prints the metrics of the log file.
-
-    This function prints the file size and the frequency of each status code
-    in the log file. It uses the global variables `total_file_size`,
-    `ordered_status_codes`, and `status_codes_freq` to retrieve the necessary
-    information.
-
-    Parameters:
-        None
-
-    Returns:
-        None
     """
     global line_count
     line_count = 0
@@ -45,11 +29,29 @@ def print_metrics():
             print("{}: {}".format(code, status_codes_freq[code]))
 
 
+def line_parsing(line):
+    """
+    Parses a log line and updates the frequency of status codes
+    and the total file size.
+
+    Args:
+        line (str): The log line to be parsed.
+    """
+    global total_file_size
+    try:
+        tokens = line.split()
+        status_code, file_size = int(tokens[-2]), int(tokens[-1])
+        if status_code in status_codes_freq:
+            status_codes_freq[status_code] += 1
+            total_file_size += file_size
+    except Exception:
+        pass
+
+
 line_count = 0
 total_file_size = 0
 status_codes_freq = {}
 ordered_status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
-pattern = '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3} - \[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}\] "GET \/projects\/260 HTTP\/1.1" \d{3} \d{1,}$'  # noqa
 
 for code in ordered_status_codes:
     status_codes_freq[code] = 0
@@ -58,15 +60,7 @@ if __name__ == "__main__":
     try:
         for line in sys.stdin:
             line_count += 1
-
-            log = line.strip()
-            if re.search(pattern, line):
-                tokens = log.split()
-                method, file_size = int(tokens[-2]), int(tokens[-1])
-                if method in status_codes_freq:
-                    status_codes_freq[method] += 1
-                    total_file_size += file_size
-
+            line_parsing(line)
             if line_count == 10:
                 print_metrics()
     except KeyboardInterrupt:
