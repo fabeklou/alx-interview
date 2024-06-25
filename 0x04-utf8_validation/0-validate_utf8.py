@@ -36,7 +36,7 @@ def validUTF8(data: List[int]) -> bool:
             False otherwise.
     """
 
-    def is_valid(index, count):
+    def is_valid(index: int, count: int) -> bool:
         """
         Helper function to check if a sequence of bytes
         starting at the given index is valid.
