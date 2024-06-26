@@ -51,7 +51,7 @@ def validUTF8(data: List[int]) -> bool:
         for _ in range(count):
             if index >= len(data):
                 return False
-            bits = data[cursor] & 0xFF
+            bits = data[index] & 0xFF
             if bits >> 6 != 2:
                 return False
             index += 1
