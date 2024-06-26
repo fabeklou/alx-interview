@@ -51,7 +51,7 @@ def validUTF8(data: List[int]) -> bool:
         for _ in range(count):
             if index >= len(data):
                 return False
-            bits = data[index]
+            bits = data[cursor] & 0xFF
             if bits >> 6 != 2:
                 return False
             index += 1
@@ -59,21 +59,21 @@ def validUTF8(data: List[int]) -> bool:
 
     cursor = 0
     while cursor < len(data):
-        bits = data[cursor] >> 3
+        bits = data[cursor] & 0xFF
 
-        if bits == 30:
+        if bits >> 3 == 0b11110:
             if not is_valid(cursor + 1, 3):
                 return False
             cursor += 4
-        elif bits >> 1 == 14:
+        elif bits >> 4 == 0b1110:
             if not is_valid(cursor + 1, 2):
                 return False
             cursor += 3
-        elif bits >> 2 == 6:
+        elif bits >> 5 == 0b110:
             if not is_valid(cursor + 1, 1):
                 return False
             cursor += 2
-        elif bits >> 4 == 0:
+        elif bits >> 7 == 0:
             cursor += 1
         else:
             return False
