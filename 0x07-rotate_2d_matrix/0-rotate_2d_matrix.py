@@ -29,11 +29,13 @@ def rotate_2d_matrix(matrix):
     """
 
     size = len(matrix)
+    m = matrix  # aliasing
+
     # Transposing
     for row in range(size):
         for col in range(row, size):
-            matrix[row][col], matrix[col][row] = matrix[col][row],\
-                matrix[row][col]
+            m[row][col], m[col][row] = m[col][row], m[row][col]
+
     # Reversing
     for row in range(size):
         matrix[row].reverse()
