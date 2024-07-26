@@ -1,39 +1,39 @@
 #!/usr/bin/python3
 
 """
-This module provides a function to calculate the minimum number
-of coins needed to make change for a given total.
+This module provides a function to calculate the minimum
+number of coins needed to make change for a given total.
 """
-
-from collections import deque
-
 
 def makeChange(coins, total):
     """
-    Calculates the minimum number of coins
-    needed to make change for a given total.
+    Calculates the minimum number of coins needed
+    to make change for a given total.
 
     Args:
-        coins (list): A list of coin denominations available.
-        total (int): The total amount to make change for.
+        coins (list): A list of coin denominations
+            available.
+        total (int): The total amount for which change
+            needs to be made.
 
     Returns:
-        int: The minimum number of coins needed to make change
-             for the total. Returns -1 if it is not possible
-             to make change for the total using the given coins.
+        int: The minimum number of coins needed to make
+            change for the given total.
+
+    Example:
+        >>> coins = [1, 2, 5]
+        >>> total = 11
+        >>> makeChange(coins, total)
+        3
     """
-    dq = deque([(0, 0)])
-    visited = set()
+    if total <= 0:
+        return 0
 
-    while dq:
-        curr, changes = dq.popleft()
+    dp = [float('inf')] * (total + 1)
+    dp[0] = 0
 
-        if curr == total:
-            return changes
+    for coin in coins:
+        for i in range(coin, total + 1):
+            dp[i] = min(dp[i], dp[i - coin] + 1)
 
-        for coin in coins:
-            if curr + coin not in visited and curr + coin <= total:
-                dq.append((curr + coin, changes + 1))
-                visited.add(curr + coin)
-
-    return -1
+    return -1 if dp[total] == float('inf') else dp[total]
