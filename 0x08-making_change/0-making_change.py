@@ -5,6 +5,7 @@ This module provides a function to calculate the minimum
 number of coins needed to make change for a given total.
 """
 
+
 def makeChange(coins, total):
     """
     Calculates the minimum number of coins needed
